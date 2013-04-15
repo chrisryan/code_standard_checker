@@ -1,7 +1,34 @@
 #!/bin/sh
 
 TMPFILE=`mktemp`
-find /www/files -type f | grep -v "/www/files/research/" | grep -v "\.git" | grep -v "\.zip" | grep -v "\.jar" | grep -v "\.cab" | grep -v "/sitelogs/" | grep -v "/coldfusion/" | grep -v "\.gif" | grep -v "\.jpg" | grep -v "\.png" | grep -v "\.jpeg" > $TMPFILE
+
+find /www/files -type f \
+    \! -name '*.zip' \
+    \! -name '*.jar' \
+    \! -name '*.cab' \
+    \! -name '*.gif' \
+    \! -name '*.png' \
+    \! -name '*.jpg' \
+    \! -name '*.jpeg' \
+    \! -path '*/.git/*' \
+    \! -path '*/www/files/research/*' \
+    \! -path '*/coldfusion/*' \
+    \! -path '*/Zend/*' \
+    \! -path '*/pear/*' \
+    \! -path '*/sitelogs/*' \
+    \! -path '*/Google/*' \
+    \! -path '*/abraham-twitteroauth-76446fa/*' \
+    \! -path '*/library/CAS/*' \
+    \! -path '*/PEAR/*' \
+    \! -path '*/Apache/*' \
+    \! -path '*/CodeCoverage/Report/*' \
+    \! -path '*/about/newsletter/*' \
+    \! -path '*/feeds/include/xsd/STAR/*' \
+    \! -path '*/phpseclib/*' \
+    > $TMPFILE
+
+
+
 filecount=`wc -l $TMPFILE | awk '{print $1}'`
 TMPFILE2=`mktemp`
 tr -s '\n' '\000' < $TMPFILE > $TMPFILE2
