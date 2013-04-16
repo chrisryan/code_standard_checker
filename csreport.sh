@@ -37,6 +37,10 @@ filecount=`wc -l $FILTEREDLIST | awk '{print $1}'`
 TMPFILE2=`mktemp`
 tr -s '\n' '\000' < $FILTEREDLIST > $TMPFILE2
 linecount=`wc -l --files0-from=$TMPFILE2 | tail -n 1 | awk '{print $1}'`
+if [ "$linecount" = "" ]
+then
+    linecount="0"
+fi
 errtot=0
 wrntot=0
 filcnt=0
