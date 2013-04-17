@@ -27,6 +27,7 @@ find /www/files -type f \
     \! -path '*/about/newsletter/*' \
     \! -path '*/feeds/include/xsd/STAR/*' \
     \! -path '*/phpseclib/*' \
+    \! -path '*/plupload/*' \
     > $TMPFILE
 
 $workingDir/csreport.sh -f $TMPFILE
