@@ -1,0 +1,98 @@
+<?php
+
+$mongo = new MongoClient();
+$db = $mongo->selectDB('tolMergeStats');
+$collection = new MongoCollection($db, 'merges');
+
+$randomHash = $collection->findOne();
+if ($randomHash == null) {
+    echo "Empty Database";
+    exit();
+}
+
+while($randomHash != null) {
+    $lastHash = $randomHash;
+    $randomHash = $collection->findOne(array('Parents' => $randomHash['Hash']));
+}
+
+$mongoData = iterator_to_array($collection->find());
+$data = array();
+
+foreach ($mongoData as $commitInfo) {
+    unset($commitInfo['_id']);
+    $data[$commitInfo['Hash']] = $commitInfo;
+}
+
+$jsonData = json_encode(
+    array(
+        'data' => $data,
+        'recentHash' => $lastHash['Hash'],
+    )
+);
+?>
+<html>
+<head>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+<link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/themes/vader/jquery-ui.css" type="text/css" rel="stylesheet" />
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+<script>
+var commitData = <?php echo $jsonData?>;
+
+function buildCommitData(hash)
+{
+    var title = 'Errors Added: ' + commitData.data[hash]["Errors Added"] +
+        '\nWarnings Added: ' + commitData.data[hash]["Warnings Added"] +
+        '\nProblem Files Added: ' + commitData.data[hash]["Problem Files Added"] +
+        '\nFiles Added: ' + commitData.data[hash]["Files Added"] +
+        '\nLines Added: ' + commitData.data[hash]["Lines Added"];
+    var firstParentHash = commitData.data[hash].Parents[0];
+    var secondParentHash = commitData.data[hash].Parents[1];
+
+    var problemChange = (Number(commitData.data[hash]["Errors Added"]) + Number(commitData.data[hash]["Warnings Added"]));
+    if (problemChange > 0) {
+        var badge = '<span class="badge badge-important">';
+        badge += problemChange;
+    } else {
+        var badge = '<span class="badge badge-success">';
+        badge += -problemChange;
+    }
+
+    badge += '</span>';
+
+    var html = '<li title="' + title + '">' + commitData.data[hash].Message + badge;
+
+    if (commitData.data[secondParentHash]) {
+        html += '<ul>';
+        html += buildCommitData(secondParentHash);
+        html += '</ul>';
+    }
+
+    html += '</li>';
+
+    if (commitData.data[firstParentHash]) {
+        var fpMessage = commitData.data[firstParentHash].Message;
+        if (fpMessage.search('42qaman60') == -1 && fpMessage.search('traT3gic') == -1) {
+            html += buildCommitData(firstParentHash);
+        }
+    }
+
+    return html;
+}
+
+$(function() {
+    var html = '<ul>';
+    html += buildCommitData(commitData.recentHash);
+    var firstParentHash = commitData.data[commitData.recentHash].Parents[0];
+    while (commitData.data[firstParentHash]) {
+        html += buildCommitData(firstParentHash);
+        firstParentHash = commitData.data[firstParentHash].Parents[0];
+    }
+    html += '/<ul>';
+    $('body').html(html);
+});
+
+</script>
+</head>
+<body></body>
+</html>
