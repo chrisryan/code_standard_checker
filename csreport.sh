@@ -1,45 +1,56 @@
 #!/bin/sh
 
-TMPFILE=`mktemp`
+QUIET=0
+SHORT=0
+FILELIST=
+while getopts "qsf:" opt; do
+    case "$opt" in
+    q)
+        QUIET=1
+        ;;
+    s)
+        SHORT=1
+        ;;
+    f)
+        FILELIST=$OPTARG
+        ;;
+    esac
+done
 
-find /www/files -type f \
-    \! -name '*.zip' \
-    \! -name '*.jar' \
-    \! -name '*.cab' \
-    \! -name '*.gif' \
-    \! -name '*.png' \
-    \! -name '*.jpg' \
-    \! -name '*.jpeg' \
-    \! -path '*/.git/*' \
-    \! -path '*/www/files/research/*' \
-    \! -path '*/coldfusion/*' \
-    \! -path '*/Zend/*' \
-    \! -path '*/pear/*' \
-    \! -path '*/sitelogs/*' \
-    \! -path '*/Google/*' \
-    \! -path '*/abraham-twitteroauth-76446fa/*' \
-    \! -path '*/library/CAS/*' \
-    \! -path '*/PEAR/*' \
-    \! -path '*/Apache/*' \
-    \! -path '*/CodeCoverage/Report/*' \
-    \! -path '*/about/newsletter/*' \
-    \! -path '*/feeds/include/xsd/STAR/*' \
-    \! -path '*/phpseclib/*' \
-    > $TMPFILE
+if [ "$FILELIST" = '' ]
+then
+  #Read from STDIN
+  FILELIST=`mktemp`
+  cp /proc/${$}/fd/0 $FILELIST
+fi
 
+FILTEREDLIST=`mktemp`
+for fileName in $(cat $FILELIST | grep -v "\.git" | grep -v "\.zip" | grep -v "\.jar" | grep -v "\.cab" | grep -v "\.gif" | grep -v "\.jpg" | grep -v "\.png" | grep -v "\.jpeg")
+do
+  if [ -f $fileName ]
+  then
+    echo $fileName >> $FILTEREDLIST
+  fi
+done
 
-
-filecount=`wc -l $TMPFILE | awk '{print $1}'`
+filecount=`wc -l $FILTEREDLIST | awk '{print $1}'`
 TMPFILE2=`mktemp`
-tr -s '\n' '\000' < $TMPFILE > $TMPFILE2
+tr -s '\n' '\000' < $FILTEREDLIST > $TMPFILE2
 linecount=`wc -l --files0-from=$TMPFILE2 | tail -n 1 | awk '{print $1}'`
+if [ "$linecount" = "" ]
+then
+    linecount="0"
+fi
 errtot=0
 wrntot=0
 filcnt=0
 proccnt=0;
-for file in `grep -v "\.min\.js" $TMPFILE`; do
+for file in `grep -v "\.min\.js" $FILTEREDLIST`; do
     proccnt=$(($proccnt + 1))
-    echo "processing $proccnt of $filecount"
+    if [ $QUIET = 0 ]
+    then
+      echo "processing $proccnt of $filecount" 1>&2
+    fi
     result=`phpcs --standard=DWS --report=summary $file | grep "^A TOTAL"`
     if [ ! -z "$result" ]; then
         errcnt=`echo $result | awk '{print $4}'`
@@ -49,11 +60,15 @@ for file in `grep -v "\.min\.js" $TMPFILE`; do
         wrntot=`expr $wrncnt + $wrntot`
     fi
 done
-echo "Total Files: $filecount"
-echo "Total Lines: $linecount"
-echo "Files with problems: $filcnt"
-echo "Errors: $errtot"
-echo "Warnings: $wrntot"
+if [ $SHORT = 0 ]
+then
+  echo "Total Files: $filecount"
+  echo "Total Lines: $linecount"
+  echo "Files with problems: $filcnt"
+  echo "Errors: $errtot"
+  echo "Warnings: $wrntot"
+else
+  echo "$filecount $linecount $filcnt $errtot $wrntot"
+fi
 
-rm $TMPFILE
 rm $TMPFILE2
