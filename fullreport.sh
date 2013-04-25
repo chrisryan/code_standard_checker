@@ -2,9 +2,4 @@
 
 workingDir=`dirname $0`
 
-TMPFILE=`mktemp`
-
-$workingDir/getFiles.sh /www/files > $TMPFILE
-$workingDir/csreport.sh -f $TMPFILE
-
-rm $TMPFILE
+$workingDir/getFiles.sh /www/files | $workingDir/csreport.sh -f -
