@@ -16,6 +16,8 @@ find $codeDir -type f \
     \! -name '*.png' \
     \! -name '*.jpg' \
     \! -name '*.jpeg' \
+    \! -name '*.sql' \
+    \! -name '*.qry' \
     \! -path '*/.git/*' \
     \! -path '*/www/files/research/*' \
     \! -path '*/coldfusion/*' \
