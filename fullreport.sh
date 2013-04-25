@@ -1,5 +1,29 @@
 #!/bin/sh
-workingDir=`dirname $0`
+workingDir=$(realpath $(dirname "${0}"))
+update=false
+
+if [ "${1}" = '-u' ]; then
+    update=true
+    shift
+fi
+
 codeDir=${1-/www/files}
+
+if "${update}"; then
+    echo "Updating ${codeDir}" >&2
+    cd "${codeDir}" || exit 1
+
+    gitRemoteBranch=$(git for-each-ref --format='%(upstream:short)' $(git symbolic-ref -q HEAD))
+    gitRemoteRepo=$(echo "${gitRemoteBranch}" | cut -d/ -f1)
+    if [ -z "${gitRemoteBranch}" -o -z "${gitRemoteRepo}" ]; then
+        echo "Failed to determine remote branch/repo." >&2
+        exit 1
+    fi
+
+    echo "Updating to ${gitRemoteBranch}" >&2
+    git fetch "${gitRemoteRepo}"
+    git reset --hard "${gitRemoteBranch}"
+    cd - >/dev/null
+fi
 
 $workingDir/getFiles.sh $codeDir | $workingDir/csreport.sh -f -
