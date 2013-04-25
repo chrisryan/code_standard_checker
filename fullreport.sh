@@ -1,35 +1,29 @@
 #!/bin/sh
+workingDir=$(realpath $(dirname "${0}"))
+update=false
 
-workingDir=`dirname $0`
+if [ "${1}" = '-u' ]; then
+    update=true
+    shift
+fi
 
-TMPFILE=`mktemp`
+codeDir=${1-/www/files}
 
-find /www/files -type f \
-    \! -name '*.zip' \
-    \! -name '*.jar' \
-    \! -name '*.cab' \
-    \! -name '*.gif' \
-    \! -name '*.png' \
-    \! -name '*.jpg' \
-    \! -name '*.jpeg' \
-    \! -path '*/.git/*' \
-    \! -path '*/www/files/research/*' \
-    \! -path '*/coldfusion/*' \
-    \! -path '*/Zend/*' \
-    \! -path '*/pear/*' \
-    \! -path '*/sitelogs/*' \
-    \! -path '*/Google/*' \
-    \! -path '*/abraham-twitteroauth-76446fa/*' \
-    \! -path '*/library/CAS/*' \
-    \! -path '*/PEAR/*' \
-    \! -path '*/Apache/*' \
-    \! -path '*/CodeCoverage/Report/*' \
-    \! -path '*/about/newsletter/*' \
-    \! -path '*/feeds/include/xsd/STAR/*' \
-    \! -path '*/phpseclib/*' \
-    \! -path '*/plupload/*' \
-    > $TMPFILE
+if "${update}"; then
+    echo "Updating ${codeDir}" >&2
+    cd "${codeDir}" || exit 1
 
-$workingDir/csreport.sh -f $TMPFILE
+    gitRemoteBranch=$(git for-each-ref --format='%(upstream:short)' $(git symbolic-ref -q HEAD))
+    gitRemoteRepo=$(echo "${gitRemoteBranch}" | cut -d/ -f1)
+    if [ -z "${gitRemoteBranch}" -o -z "${gitRemoteRepo}" ]; then
+        echo "Failed to determine remote branch/repo." >&2
+        exit 1
+    fi
 
-rm $TMPFILE
+    echo "Updating to ${gitRemoteBranch}" >&2
+    git fetch "${gitRemoteRepo}"
+    git reset --hard "${gitRemoteBranch}"
+    cd - >/dev/null
+fi
+
+$workingDir/getFiles.sh $codeDir | $workingDir/csreport.sh -f -
