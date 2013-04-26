@@ -32,13 +32,14 @@ if ! git diff-index --quiet HEAD; then
     exit 1
 fi
 
-mergeHash=$(git rev-parse "${mergeRef}")
+mergeHash=$(git rev-parse --abbrev-ref "${mergeRef}")
+mergeHashParent=$(git rev-parse "${mergeRef}~")
 startingCommit=$(git rev-parse --abbrev-ref HEAD)
 if [ "${startingCommit}" = 'HEAD' ]; then
     startingCommit=$(git rev-parse HEAD)
 fi
 
-gitDiffFiles=$(git diff-tree --no-commit-id --name-only -m -r "${mergeHash}" | sort)
+gitDiffFiles=$(git diff-tree --name-only -r "${mergeHashParent}" "${mergeHash}" | sort)
 processFiles="${gitDiffFiles}"
 
 if "${showOnlyTracking}"; then
@@ -47,12 +48,15 @@ if "${showOnlyTracking}"; then
     processFiles="${changedAndTrackedFiles}"
 fi
 
+[ -n "${quietFlag}" ] || echo "Checking out ${mergeHash}" >&2
 git checkout ${quietFlag} "${mergeHash}" >&2
 afterStats=($(echo "${processFiles}" | ${workingDir}/csreport.sh ${quietFlag} -s))
 
-git checkout ${quietFlag} "${mergeHash}~" >&2
+[ -n "${quietFlag}" ] || echo "Checking out ${mergeHash}~ = ${mergeHashParent}" >&2
+git checkout ${quietFlag} "${mergeHashParent}" >&2
 beforeStats=($(echo "${processFiles}" | ${workingDir}/csreport.sh ${quietFlag} -s))
 
+[ -n "${quietFlag}" ] || echo "Checking out ${startingCommit}" >&2
 git checkout ${quietFlag} "${startingCommit}" >&2
 
 filesAdded=$(expr "${afterStats[0]}" - "${beforeStats[0]}")
