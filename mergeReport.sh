@@ -48,13 +48,13 @@ if "${QUIET}"; then
     quietFlag='-q'
 fi
 
-git checkout ${quietFlag} "${MERGEHASH}"
+git checkout ${quietFlag} "${MERGEHASH}" >&2
 AFTER=($(echo "${processFiles}" | ${workingDir}/csreport.sh ${quietFlag} -s))
 
-git checkout ${quietFlag} "${MERGEHASH}~"
+git checkout ${quietFlag} "${MERGEHASH}~" >&2
 BEFORE=($(echo "${processFiles}" | ${workingDir}/csreport.sh ${quietFlag} -s))
 
-git checkout ${quietFlag} "${STARTINGCOMMIT}"
+git checkout ${quietFlag} "${STARTINGCOMMIT}" >&2
 
 FILESADDED=$(expr ${AFTER[0]} - ${BEFORE[0]})
 LINESADDED=$(expr ${AFTER[1]} - ${BEFORE[1]})
