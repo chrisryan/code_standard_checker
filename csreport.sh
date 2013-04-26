@@ -94,7 +94,7 @@ while read file; do
         [ "${wrnpcnt}" -gt 20 ] && wrnpclr="${purple}"
         [ "${wrnpcnt}" -gt 30 ] && wrnpclr="${brightpurple}"
 
-        printf "\r${errclr}%10s${clroff} ${errpclr}%5s${clroff} ${wrnclr}%5s${clroff} ${wrnpclr}%5s${clroff} : ${blue}${file}${clroff}\n" "${errcnt}E" "${errpcnt}%E" "${wrncnt}W" "${wrnpcnt}%W"
+        printf "\r${errclr}%10s${clroff} ${errpclr}%5s${clroff} ${wrnclr}%5s${clroff} ${wrnpclr}%5s${clroff} : ${blue}${file}${clroff}\n" "${errcnt}E" "${errpcnt}%E" "${wrncnt}W" "${wrnpcnt}%W" >&2
     fi
 done <<< "${files}"
 
