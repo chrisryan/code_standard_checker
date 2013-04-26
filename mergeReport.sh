@@ -2,14 +2,18 @@
 
 SHORT=0
 QUIET=0
+showOnlyTracking=false
 mergeRef='HEAD'
-while getopts "qsc:" opt; do
+while getopts "qstc:" opt; do
     case "$opt" in
     s)
         SHORT=1
         ;;
     q)
         QUIET=1
+        ;;
+    t)
+        showOnlyTracking=true
         ;;
     c)
         mergeRef="${OPTARG}"
@@ -30,28 +34,30 @@ if [ "${STARTINGCOMMIT}" = 'HEAD' ]; then
     STARTINGCOMMIT=$(git rev-parse HEAD)
 fi
 
-TMPFILE=`mktemp`
-git diff-tree --no-commit-id --name-only -m -r "${MERGEHASH}" > $TMPFILE
+gitDiffFiles=$(git diff-tree --no-commit-id --name-only -m -r "${MERGEHASH}" | sort)
+processFiles="${gitDiffFiles}"
+
+if "${showOnlyTracking}"; then
+    trackingFiles=$(${workingDir}/getFiles.sh | sed 's#^./##' | sort)
+    changedAndTrackedFiles=$(comm -12 <(echo "${gitDiffFiles}") <(echo "${trackingFiles}"))
+    processFiles="${changedAndTrackedFiles}"
+fi
 
 if [ $QUIET = 0 ]
 then
   git checkout $MERGEHASH
-
-  AFTER=($($workingDir/csreport.sh -sf $TMPFILE))
+  AFTER=($(echo "${processFiles}" | ${workingDir}/csreport.sh -sf -))
 
   git checkout $MERGEHASH~
-
-  BEFORE=($($workingDir/csreport.sh -sf $TMPFILE))
+  BEFORE=($(echo "${processFiles}" | ${workingDir}/csreport.sh -sf -))
 
   git checkout $STARTINGCOMMIT
 else
   git checkout -q $MERGEHASH
-
-  AFTER=($($workingDir/csreport.sh -qsf $TMPFILE))
+  AFTER=($(echo "${processFiles}" | ${workingDir}/csreport.sh -qsf -))
 
   git checkout -q $MERGEHASH~
-
-  BEFORE=($($workingDir/csreport.sh -qsf $TMPFILE))
+  BEFORE=($(echo "${processFiles}" | ${workingDir}/csreport.sh -qsf -))
 
   git checkout -q $STARTINGCOMMIT
 fi
@@ -101,5 +107,3 @@ then
 else
   echo "$FILESADDED $LINESADDED $PROBFILESADDED $ERRORSADDED $WARNADDED"
 fi
-
-rm $TMPFILE
