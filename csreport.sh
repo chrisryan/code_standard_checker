@@ -25,7 +25,7 @@ then
 fi
 
 FILTEREDLIST=`mktemp`
-for fileName in $(cat $FILELIST | grep -v "\.git" | grep -v "\.zip" | grep -v "\.jar" | grep -v "\.cab" | grep -v "\.gif" | grep -v "\.jpg" | grep -v "\.png" | grep -v "\.jpeg")
+for fileName in $(cat $FILELIST)
 do
   if [ -f $fileName ]
   then
@@ -45,7 +45,7 @@ errtot=0
 wrntot=0
 filcnt=0
 proccnt=0;
-for file in `grep -v "\.min\.js" $FILTEREDLIST`; do
+for file in `cat $FILTEREDLIST`; do
     proccnt=$(($proccnt + 1))
     if [ $QUIET = 0 ]
     then

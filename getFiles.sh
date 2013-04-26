@@ -18,6 +18,7 @@ find $codeDir -type f \
     \! -name '*.jpeg' \
     \! -name '*.sql' \
     \! -name '*.qry' \
+    \! -name '*.min.js' \
     \! -path '*/.git/*' \
     \! -path '*/www/files/research/*' \
     \! -path '*/coldfusion/*' \
