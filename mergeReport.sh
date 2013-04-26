@@ -2,7 +2,7 @@
 
 function gco {
     [ -n "${quietFlag}" ] || echo "Checking out ${1}" >&2
-    git checkout ${quietFlag} "${1}" >&2
+    git checkout ${quietFlag} "${1}" >/dev/null 2>&1
 }
 
 short=false
