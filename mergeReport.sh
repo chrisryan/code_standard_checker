@@ -19,10 +19,9 @@ done
 
 workingDir=$(dirname $0)
 
-if [ "$(git status -s)" != "" ]
-then
-  echo Must have a clean working directory
-  exit
+if ! git diff-index --quiet HEAD; then
+  echo 'Must have a clean working directory' >&2
+  exit 1
 fi
 
 MERGEHASH=$(git rev-parse "${mergeRef}")
