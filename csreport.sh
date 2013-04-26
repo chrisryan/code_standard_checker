@@ -1,5 +1,6 @@
 #!/bin/bash
 
+workingDir=$(realpath $(dirname "${0}"))
 QUIET=false
 SHORT=false
 FILELIST=-
@@ -48,7 +49,7 @@ while read file; do
     lncnt=$(wc -l < "${file}")
     linecount=$(expr "${linecount}" + "${lncnt}")
 
-    if phpcs=$(phpcs --standard=DWS --report=summary "${file}"); then
+    if phpcs=$(${workingDir}/vendor/bin/phpcs --standard="${workingDir}/vendor/dominionenterprises/dws-coding-standard/DWS" --report=summary "${file}"); then
         errcnt=0
         wrncnt=0
     else
