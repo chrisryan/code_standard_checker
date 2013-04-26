@@ -33,10 +33,9 @@ while read file; do
     proccnt=$(expr "${proccnt}" + 1)
     "${QUIET}" || echo "processing ${proccnt} of ${filecount} : ${file}" >&2
 
-    result=$(phpcs --standard=DWS --report=summary ${file} | grep "^A TOTAL")
-    if [ -n "${result}" ]; then
-        errcnt=$(echo "${result}" | awk '{print $4}')
-        wrncnt=$(echo "${result}" | awk '{print $7}')
+    if ! phpcs=$(phpcs --standard=DWS --report=summary "${file}"); then
+        counts=$(echo "${phpcs}" | sed '/A TOTAL OF/!d; s/A TOTAL OF \([0-9]\+\) ERROR(S) AND \([0-9]\+\) WARNING(S) .*/\1 \2/')
+        read errcnt wrncnt <<< "${counts}"
 
         filcnt=$(expr "${filcnt}" + 1)
         errtot=$(expr "${errcnt}" + "${errtot}")
