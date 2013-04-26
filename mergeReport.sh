@@ -1,5 +1,10 @@
 #!/bin/bash
 
+function gco {
+    [ -n "${quietFlag}" ] || echo "Checking out ${1}" >&2
+    git checkout ${quietFlag} "${1}" >&2
+}
+
 short=false
 quietFlag=''
 showOnlyTracking=false
@@ -48,16 +53,13 @@ if "${showOnlyTracking}"; then
     processFiles="${changedAndTrackedFiles}"
 fi
 
-[ -n "${quietFlag}" ] || echo "Checking out ${mergeHash}" >&2
-git checkout ${quietFlag} "${mergeHash}" >&2
+gco "${mergeHash}"
 afterStats=($(echo "${processFiles}" | ${workingDir}/csreport.sh ${quietFlag} -s))
 
-[ -n "${quietFlag}" ] || echo "Checking out ${mergeHash}~ = ${mergeHashParent}" >&2
-git checkout ${quietFlag} "${mergeHashParent}" >&2
+gco "${mergeHashParent}"
 beforeStats=($(echo "${processFiles}" | ${workingDir}/csreport.sh ${quietFlag} -s))
 
-[ -n "${quietFlag}" ] || echo "Checking out ${startingCommit}" >&2
-git checkout ${quietFlag} "${startingCommit}" >&2
+gco "${startingCommit}"
 
 filesAdded=$(expr "${afterStats[0]}" - "${beforeStats[0]}")
 linesAdded=$(expr "${afterStats[1]}" - "${beforeStats[1]}")
