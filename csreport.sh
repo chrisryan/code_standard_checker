@@ -1,74 +1,57 @@
 #!/bin/sh
 
-QUIET=0
-SHORT=0
-FILELIST=
+QUIET=false
+SHORT=false
+FILELIST=-
 while getopts "qsf:" opt; do
-    case "$opt" in
+    case "${opt}" in
     q)
-        QUIET=1
+        QUIET=true
         ;;
     s)
-        SHORT=1
+        SHORT=true
         ;;
     f)
-        FILELIST=$OPTARG
+        FILELIST="${OPTARG}"
         ;;
     esac
 done
 
-if [ "$FILELIST" = '' ]
-then
-  #Read from STDIN
-  FILELIST=`mktemp`
-  cp /proc/${$}/fd/0 $FILELIST
-fi
+files=$(cat "${FILELIST}")
+filecount=$(echo "${files}" | wc -l)
 
-FILTEREDLIST=`mktemp`
-for fileName in $(cat $FILELIST)
-do
-  if [ -f $fileName ]
-  then
-    echo $fileName >> $FILTEREDLIST
-  fi
-done
+TMPFILE2=$(mktemp)
+echo "${files}" | tr -s '\n' '\000' > "${TMPFILE2}"
+linecount=$(wc -l --files0-from="${TMPFILE2}" | tail -n 1 | awk '{print $1}')
+[ -z "${linecount}" ] && linecount="0"
 
-filecount=`wc -l $FILTEREDLIST | awk '{print $1}'`
-TMPFILE2=`mktemp`
-tr -s '\n' '\000' < $FILTEREDLIST > $TMPFILE2
-linecount=`wc -l --files0-from=$TMPFILE2 | tail -n 1 | awk '{print $1}'`
-if [ "$linecount" = "" ]
-then
-    linecount="0"
-fi
 errtot=0
 wrntot=0
 filcnt=0
-proccnt=0;
-for file in `cat $FILTEREDLIST`; do
-    proccnt=$(($proccnt + 1))
-    if [ $QUIET = 0 ]
-    then
-      echo "processing $proccnt of $filecount" 1>&2
+proccnt=0
+while read file; do
+    proccnt=$(expr "${proccnt}" + 1)
+    "${QUIET}" || echo "processing ${proccnt} of ${filecount} : ${file}" >&2
+
+    result=$(phpcs --standard=DWS --report=summary ${file} | grep "^A TOTAL")
+    if [ -n "${result}" ]; then
+        errcnt=$(echo "${result}" | awk '{print $4}')
+        wrncnt=$(echo "${result}" | awk '{print $7}')
+
+        filcnt=$(expr "${filcnt}" + 1)
+        errtot=$(expr "${errcnt}" + "${errtot}")
+        wrntot=$(expr "${wrncnt}" + "${wrntot}")
     fi
-    result=`phpcs --standard=DWS --report=summary $file | grep "^A TOTAL"`
-    if [ ! -z "$result" ]; then
-        errcnt=`echo $result | awk '{print $4}'`
-        wrncnt=`echo $result | awk '{print $7}'`
-        filcnt=$(($filcnt + 1))
-        errtot=`expr $errcnt + $errtot`
-        wrntot=`expr $wrncnt + $wrntot`
-    fi
-done
-if [ $SHORT = 0 ]
-then
-  echo "Total Files: $filecount"
-  echo "Total Lines: $linecount"
-  echo "Files with problems: $filcnt"
-  echo "Errors: $errtot"
-  echo "Warnings: $wrntot"
+done <<< "${files}"
+
+if "${SHORT}"; then
+  echo "${filecount} ${linecount} ${filcnt} ${errtot} ${wrntot}"
 else
-  echo "$filecount $linecount $filcnt $errtot $wrntot"
+  echo "Total Files: ${filecount}"
+  echo "Total Lines: ${linecount}"
+  echo "Files with problems: ${filcnt}"
+  echo "Errors: ${errtot}"
+  echo "Warnings: ${wrntot}"
 fi
 
-rm $TMPFILE2
+rm "${TMPFILE2}"
