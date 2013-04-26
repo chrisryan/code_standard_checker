@@ -21,7 +21,11 @@ while getopts "qstc:" opt; do
     esac
 done
 
-workingDir=$(dirname $0)
+workingDir=$(realpath $(dirname "${0}"))
+
+shift $(expr ${OPTIND} - 1)
+codeDir=${1:-.}
+cd "${codeDir}" || exit 1
 
 if ! git diff-index --quiet HEAD; then
   echo 'Must have a clean working directory' >&2
