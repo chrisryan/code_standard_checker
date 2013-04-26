@@ -20,6 +20,17 @@ done
 files=$(cat "${FILELIST}")
 filecount=$(echo "${files}" | wc -l)
 
+clroff='\e[0m'
+red='\e[0;31m'
+brightred='\e[1;31m'
+green='\e[0;32m'
+brightgreen='\e[1;32m'
+yellow='\e[0;33m'
+brightyellow='\e[1;33m'
+purple='\e[0;35m'
+brightpurple='\e[1;35m'
+blue='\e[0;36m'
+
 errtot=0
 wrntot=0
 filcnt=0
@@ -27,18 +38,63 @@ proccnt=0
 linecount=0
 while read file; do
     proccnt=$(expr "${proccnt}" + 1)
-    "${QUIET}" || echo "processing ${proccnt} of ${filecount} : ${file}" >&2
+    "${QUIET}" || echo -en "processing ${proccnt} of ${filecount}: ${blue}${file}${clroff}..." >&2
 
     lncnt=$(wc -l < "${file}")
     linecount=$(expr "${linecount}" + "${lncnt}")
 
-    if ! phpcs=$(phpcs --standard=DWS --report=summary "${file}"); then
+    if phpcs=$(phpcs --standard=DWS --report=summary "${file}"); then
+        errcnt=0
+        wrncnt=0
+    else
         counts=$(echo "${phpcs}" | sed '/A TOTAL OF/!d; s/A TOTAL OF \([0-9]\+\) ERROR(S) AND \([0-9]\+\) WARNING(S) .*/\1 \2/')
         read errcnt wrncnt <<< "${counts}"
 
         filcnt=$(expr "${filcnt}" + 1)
         errtot=$(expr "${errcnt}" + "${errtot}")
         wrntot=$(expr "${wrncnt}" + "${wrntot}")
+    fi
+
+    if [ "${lncnt}" = "0" ]; then
+        errpcnt=0
+        wrnpcnt=0
+    else
+        errpcnt=$(expr "${errcnt}" \* 100 / "${lncnt}")
+        wrnpcnt=$(expr "${wrncnt}" \* 100 / "${lncnt}")
+    fi
+
+    if ! "${QUIET}"; then
+        [ "${errcnt}" = "0" ] && errclr="${green}"
+        [ "${errcnt}" -gt 0 ] && errclr="${yellow}"
+        [ "${errcnt}" -gt 200 ] && errclr="${brightyellow}"
+        [ "${errcnt}" -gt 500 ] && errclr="${brightred}"
+        [ "${errcnt}" -gt 1200 ] && errclr="${purple}"
+        [ "${errcnt}" -gt 2000 ] && errclr="${brightpurple}"
+
+        [ "${errpcnt}" = "0" ] && errpclr="${green}"
+        [ "${errpcnt}" -gt 0 ] && errpclr="${yellow}"
+        [ "${errpcnt}" -gt 50 ] && errpclr="${brightyellow}"
+        [ "${errpcnt}" -gt 90 ] && errpclr="${brightred}"
+        [ "${errpcnt}" -gt 200 ] && errpclr="${purple}"
+        [ "${errpcnt}" -gt 250 ] && errpclr="${brightpurple}"
+
+        [ "${wrncnt}" = "0" ] && wrnclr="${green}"
+        [ "${wrncnt}" -gt 0 ] && wrnclr="${yellow}"
+        [ "${wrncnt}" -gt 10 ] && wrnclr="${brightyellow}"
+        [ "${wrncnt}" -gt 25 ] && wrnclr="${red}"
+        [ "${wrncnt}" -gt 40 ] && wrnclr="${brightred}"
+        [ "${wrncnt}" -gt 70 ] && wrnclr="${purple}"
+        [ "${wrncnt}" -gt 100 ] && wrnclr="${brightpurple}"
+
+        [ "${wrnpcnt}" = "0" ] && wrnpclr="${green}"
+        [ "${wrnpcnt}" -gt 0 ] && wrnpclr="${yellow}"
+        [ "${wrnpcnt}" -gt 5 ] && wrnpclr="${brightyellow}"
+        [ "${wrnpcnt}" -gt 10 ] && wrnpclr="${red}"
+        [ "${wrnpcnt}" -gt 15 ] && wrnpclr="${brightred}"
+        [ "${wrnpcnt}" -gt 20 ] && wrnpclr="${purple}"
+        [ "${wrnpcnt}" -gt 30 ] && wrnpclr="${brightpurple}"
+
+        printf "\r${errclr}%10s${clroff} ${errpclr}%5s${clroff} ${wrnclr}%5s${clroff} ${wrnpclr}%5s${clroff} : ${blue}${file}${clroff}\n" "${errcnt}E" "${errpcnt}%E" "${wrncnt}W" "${wrnpcnt}%W"
     fi
 done <<< "${files}"
 
