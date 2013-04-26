@@ -1,12 +1,7 @@
 #!/bin/sh
 workingDir=`dirname $0`
 
-if [ $# -ne 1 ]; then
-    echo "Usage: `basename $0` codeDirectory" >&2
-    exit 1;
-fi
-
-codeDir=$1
+codeDir=${1-.}
 
 find $codeDir -type f \
     \! -name '*.zip' \
