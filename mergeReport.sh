@@ -40,6 +40,7 @@ fi
 mergeHash=$(git rev-parse --abbrev-ref "${mergeRef}")
 baseHash=$(git rev-parse "${mergeRef}~")
 [ -n "${baseRef}" ] && baseHash=$(git rev-parse "${baseRef}")
+baseHash=$(git merge-base "${baseHash}" "${mergeHash}")
 
 startingCommit=$(git rev-parse --abbrev-ref HEAD)
 if [ "${startingCommit}" = 'HEAD' ]; then
