@@ -26,4 +26,4 @@ if "${update}"; then
     cd - >/dev/null
 fi
 
-$workingDir/getFiles.sh $codeDir | $workingDir/csreport.sh -f -
+${workingDir}/getFiles.sh "${codeDir}" | ${workingDir}/csreport.sh -f -
