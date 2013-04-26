@@ -16,6 +16,7 @@ find $codeDir -type f \
     \! -name '*.png' \
     \! -name '*.jpg' \
     \! -name '*.jpeg' \
+    \! -name '*.ico' \
     \! -name '*.sql' \
     \! -name '*.qry' \
     \! -name '*.js' \
@@ -28,10 +29,22 @@ find $codeDir -type f \
     \! -name '*.ini' \
     \! -name '*.lock' \
     \! -name '*.xml' \
+    \! -name '*.xslt' \
+    \! -name '*.xsd' \
+    \! -name '*.wsdl' \
     \! -name '*.wddx' \
+    \! -name '*.svgz' \
+    \! -name '*woff' \
+    \! -name '*svg' \
+    \! -name '*eot' \
+    \! -name '*.pdf' \
+    \! -name '*.conf' \
+    \! -name '*.basemod' \
+    \! -name '*.base' \
     \! -path '*/.git/*' \
     \! -path '*/www/files/research/*' \
     \! -path '*/coldfusion/*' \
+    \! -path '*/PhoneFactor/*' \
     \! -path '*/Zend/*' \
     \! -path '*/pear/*' \
     \! -path '*/sitelogs/*' \
@@ -42,6 +55,7 @@ find $codeDir -type f \
     \! -path '*/Apache/*' \
     \! -path '*/CodeCoverage/Report/*' \
     \! -path '*/about/newsletter/*' \
+    \! -path '*/newsletter/*.html' \
     \! -path '*/feeds/include/xsd/STAR/*' \
     \! -path '*/phpseclib/*' \
     \! -path '*/plupload/*'
