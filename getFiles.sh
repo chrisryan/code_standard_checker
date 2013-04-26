@@ -41,7 +41,11 @@ find $codeDir -type f \
     \! -name '*.conf' \
     \! -name '*.basemod' \
     \! -name '*.base' \
+    \! -name '*.md' \
+    \! -name '*.markdown' \
+    \! -name '*.git' \
     \! -path '*/.git/*' \
+    \! -path '*/vendor/*' \
     \! -path '*/www/files/research/*' \
     \! -path '*/coldfusion/*' \
     \! -path '*/PhoneFactor/*' \
