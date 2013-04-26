@@ -18,7 +18,17 @@ find $codeDir -type f \
     \! -name '*.jpeg' \
     \! -name '*.sql' \
     \! -name '*.qry' \
-    \! -name '*.min.js' \
+    \! -name '*.js' \
+    \! -name '*.css' \
+    \! -name '*.json' \
+    \! -name '*.sh' \
+    \! -name '*.txt' \
+    \! -name '*.gitignore' \
+    \! -name '*.xls' \
+    \! -name '*.ini' \
+    \! -name '*.lock' \
+    \! -name '*.xml' \
+    \! -name '*.wddx' \
     \! -path '*/.git/*' \
     \! -path '*/www/files/research/*' \
     \! -path '*/coldfusion/*' \
