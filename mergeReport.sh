@@ -31,7 +31,7 @@ if [ "${STARTINGCOMMIT}" = 'HEAD' ]; then
 fi
 
 TMPFILE=`mktemp`
-git diff --name-only $MERGEHASH $MERGEHASH~ > $TMPFILE
+git diff-tree --no-commit-id --name-only -m -r "${MERGEHASH}" > $TMPFILE
 
 if [ $QUIET = 0 ]
 then
