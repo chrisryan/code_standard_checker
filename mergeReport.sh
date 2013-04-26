@@ -8,7 +8,8 @@ function gco {
 short=false
 quietFlag=''
 mergeRef='HEAD'
-while getopts "qsc:" opt; do
+baseRef=''
+while getopts "qsc:b:" opt; do
     case "${opt}" in
         s)
             short=true
@@ -18,6 +19,9 @@ while getopts "qsc:" opt; do
             ;;
         c)
             mergeRef="${OPTARG}"
+            ;;
+        b)
+            baseRef="${OPTARG}"
             ;;
     esac
 done
@@ -34,7 +38,9 @@ if ! git diff-index --quiet HEAD; then
 fi
 
 mergeHash=$(git rev-parse --abbrev-ref "${mergeRef}")
-mergeHashParent=$(git rev-parse "${mergeRef}~")
+baseHash=$(git rev-parse "${mergeRef}~")
+[ -n "${baseRef}" ] && baseHash=$(git rev-parse "${baseRef}")
+
 startingCommit=$(git rev-parse --abbrev-ref HEAD)
 if [ "${startingCommit}" = 'HEAD' ]; then
     startingCommit=$(git rev-parse HEAD)
@@ -43,17 +49,17 @@ fi
 gco "${mergeHash}"
 trackingFilesAfter=$(${workingDir}/getFiles.sh | sed 's#^./##' | sort)
 
-gco "${mergeHashParent}"
+gco "${baseHash}"
 trackingFilesBefore=$(${workingDir}/getFiles.sh | sed 's#^./##' | sort)
 
 trackingFiles=$(cat <(echo "${trackingFilesAfter}") <(echo "${trackingFilesBefore}") | sort | uniq)
-gitDiffFiles=$(git diff-tree --name-only -r "${mergeHashParent}" "${mergeHash}" | sort)
+gitDiffFiles=$(git diff-tree --name-only -r "${baseHash}" "${mergeHash}" | sort)
 changedAndTrackedFiles=$(comm -12 <(echo "${gitDiffFiles}") <(echo "${trackingFiles}"))
 
 gco "${mergeHash}"
 afterStats=($(echo "${changedAndTrackedFiles}" | ${workingDir}/csreport.sh ${quietFlag} -s))
 
-gco "${mergeHashParent}"
+gco "${baseHash}"
 beforeStats=($(echo "${changedAndTrackedFiles}" | ${workingDir}/csreport.sh ${quietFlag} -s))
 
 gco "${startingCommit}"
