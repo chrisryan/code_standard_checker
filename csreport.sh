@@ -40,6 +40,11 @@ while read file; do
     proccnt=$(expr "${proccnt}" + 1)
     "${QUIET}" || echo -en "processing ${proccnt} of ${filecount}: ${blue}${file}${clroff}..." >&2
 
+    if [ ! -f "${file}" ]; then
+        printf "\r%28s : ${blue}${file}${clroff}\n" "file does not exist" >&2
+        continue
+    fi
+
     lncnt=$(wc -l < "${file}")
     linecount=$(expr "${linecount}" + "${lncnt}")
 
