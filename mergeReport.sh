@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SHORT=0
-QUIET=0
+QUIET=false
 showOnlyTracking=false
 mergeRef='HEAD'
 while getopts "qstc:" opt; do
@@ -10,7 +10,7 @@ while getopts "qstc:" opt; do
         SHORT=1
         ;;
     q)
-        QUIET=1
+        QUIET=true
         ;;
     t)
         showOnlyTracking=true
@@ -43,24 +43,18 @@ if "${showOnlyTracking}"; then
     processFiles="${changedAndTrackedFiles}"
 fi
 
-if [ $QUIET = 0 ]
-then
-  git checkout $MERGEHASH
-  AFTER=($(echo "${processFiles}" | ${workingDir}/csreport.sh -sf -))
-
-  git checkout $MERGEHASH~
-  BEFORE=($(echo "${processFiles}" | ${workingDir}/csreport.sh -sf -))
-
-  git checkout $STARTINGCOMMIT
-else
-  git checkout -q $MERGEHASH
-  AFTER=($(echo "${processFiles}" | ${workingDir}/csreport.sh -qsf -))
-
-  git checkout -q $MERGEHASH~
-  BEFORE=($(echo "${processFiles}" | ${workingDir}/csreport.sh -qsf -))
-
-  git checkout -q $STARTINGCOMMIT
+quietFlag=''
+if "${QUIET}"; then
+    quietFlag='-q'
 fi
+
+git checkout ${quietFlag} "${MERGEHASH}"
+AFTER=($(echo "${processFiles}" | ${workingDir}/csreport.sh ${quietFlag} -s))
+
+git checkout ${quietFlag} "${MERGEHASH}~"
+BEFORE=($(echo "${processFiles}" | ${workingDir}/csreport.sh ${quietFlag} -s))
+
+git checkout ${quietFlag} "${STARTINGCOMMIT}"
 
 FILESADDED=$(expr ${AFTER[0]} - ${BEFORE[0]})
 LINESADDED=$(expr ${AFTER[1]} - ${BEFORE[1]})
