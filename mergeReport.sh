@@ -2,7 +2,7 @@
 
 SHORT=0
 QUIET=0
-MERGEHASH=$(git log -1 --format=%H)
+mergeRef='HEAD'
 while getopts "qsc:" opt; do
     case "$opt" in
     s)
@@ -12,7 +12,7 @@ while getopts "qsc:" opt; do
         QUIET=1
         ;;
     c)
-        MERGEHASH=$(git log -1 --format=%H $OPTARG)
+        mergeRef="${OPTARG}"
         ;;
     esac
 done
@@ -25,11 +25,10 @@ then
   exit
 fi
 
+MERGEHASH=$(git rev-parse "${mergeRef}")
 STARTINGCOMMIT=$(git rev-parse --abbrev-ref HEAD)
-
-if [ "$STARTINGCOMMIT" = "HEAD" ]
-then
-  STARTINGCOMMIT=$(git log -1 --format=%H HEAD)
+if [ "${STARTINGCOMMIT}" = 'HEAD' ]; then
+    STARTINGCOMMIT=$(git rev-parse HEAD)
 fi
 
 TMPFILE=`mktemp`
