@@ -4,7 +4,8 @@ PULL=
 REMOTE=
 shortFlag=''
 quietFlag=''
-while getopts "sqr:p:" opt; do
+githubToken=''
+while getopts "sqr:p:g:" opt; do
     case "$opt" in
     s)
         shortFlag='-s'
@@ -18,6 +19,8 @@ while getopts "sqr:p:" opt; do
     r)
         REMOTE=$OPTARG
         ;;
+    g)
+        githubToken="${OPTARG}"
     esac
 done
 
@@ -45,4 +48,13 @@ if ! git fetch "${REMOTE}" "+refs/pull/${PULL}/head:refs/remotes/${localRef}"; t
     exit 1
 fi
 
-${workingDir}/mergeReport.sh ${quietFlag} ${shortFlag} -c "${localRef}" -b "${REMOTE}/master"
+result=$(${workingDir}/mergeReport.sh ${quietFlag} ${shortFlag} -c "${localRef}" -b "${REMOTE}/master")
+echo "${result}"
+
+githubComment="This comment was generated automatically by the [coding standard checker](https://github.com/chrisryan/code_standard_checker).\\n\\n${result//
+/\\n}"
+
+if [ -n "${githubToken}" ]; then
+    githubRepo=$(git config --get "remote.${REMOTE}.url" | sed 's#.*[:/]\([^/]\+/[^/.]\+\)\.git.*#\1#')
+    curl -H "Authorization: token ${githubToken}" -d "{\"body\": \"${githubComment}\"}" "https://api.github.com/repos/${githubRepo}/issues/${PULL}/comments"
+fi
