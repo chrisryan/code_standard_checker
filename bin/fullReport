@@ -1,5 +1,5 @@
 #!/bin/bash
-workingDir=$(realpath $(dirname "${0}"))
+workingDir=$(readlink -m $(dirname "${0}"))
 update=false
 
 if [ "${1}" = '-u' ]; then

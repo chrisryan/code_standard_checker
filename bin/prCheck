@@ -1,11 +1,12 @@
 #!/bin/bash
 
 PULL=
-REMOTE=
+REMOTE='origin'
 shortFlag=''
 quietFlag=''
 githubToken=''
-while getopts "sqr:p:g:" opt; do
+githubRepository=''
+while getopts "sqr:p:g:R:" opt; do
     case "$opt" in
     s)
         shortFlag='-s'
@@ -19,8 +20,12 @@ while getopts "sqr:p:g:" opt; do
     r)
         REMOTE=$OPTARG
         ;;
+    R)
+        githubRepository="${OPTARG}"
+	;;
     g)
         githubToken="${OPTARG}"
+	;;
     esac
 done
 
@@ -30,16 +35,16 @@ then
     exit
 fi
 
-if [ "$REMOTE" = '' ]
-then
-    echo Must specify a remote
-    exit
-fi
-
-workingDir=$(realpath $(dirname "${0}"))
+workingDir=$(readlink -m $(dirname "${0}"))
 
 shift $(expr "${OPTIND}" - 1)
 codeDir="${1:-.}"
+if [ ! -d "${codeDir}" ]; then
+    if [ -n "${githubToken}" -a -n "${githubRepository}" ]; then
+        git clone "https://${githubToken}:x-oauth-basic@github.com/${githubRepository}.git" "${codeDir}"
+    fi
+fi
+
 cd "${codeDir}" || exit 1
 
 localRef="${REMOTE}/pr/${PULL}"
@@ -56,5 +61,5 @@ githubComment="This comment was generated automatically by the [coding standard 
 
 if [ -n "${githubToken}" ]; then
     githubRepo=$(git config --get "remote.${REMOTE}.url" | sed 's#.*[:/]\([^/]\+/[^/.]\+\)\.git.*#\1#')
-    curl -H "Authorization: token ${githubToken}" -d "{\"body\": \"${githubComment}\"}" "https://api.github.com/repos/${githubRepo}/issues/${PULL}/comments"
+    curl -H "Authorization: token ${githubToken}" -d "{\"body\": \"${githubComment}\"}" "https://api.github.com/repos/${githubRepo}/issues/${PULL}/comments" >&2
 fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-workingDir=$(realpath $(dirname "${0}"))
+workingDir=$(readlink -m $(dirname "${0}"))
 appDir=$(dirname "${workingDir}")
 QUIET=false
 SHORT=false
