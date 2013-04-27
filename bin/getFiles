@@ -1,6 +1,4 @@
 #!/bin/sh
-workingDir=`dirname $0`
-
 codeDir=${1-.}
 
 find $codeDir -type f \

@@ -48,20 +48,20 @@ if [ "${startingCommit}" = 'HEAD' ]; then
 fi
 
 gco "${mergeHash}"
-trackingFilesAfter=$(${workingDir}/getFiles.sh | sed 's#^./##' | sort)
+trackingFilesAfter=$(${workingDir}/getFiles | sed 's#^./##' | sort)
 
 gco "${baseHash}"
-trackingFilesBefore=$(${workingDir}/getFiles.sh | sed 's#^./##' | sort)
+trackingFilesBefore=$(${workingDir}/getFiles | sed 's#^./##' | sort)
 
 trackingFiles=$(cat <(echo "${trackingFilesAfter}") <(echo "${trackingFilesBefore}") | sort | uniq)
 gitDiffFiles=$(git diff-tree --name-only -r "${baseHash}" "${mergeHash}" | sort)
 changedAndTrackedFiles=$(comm -12 <(echo "${gitDiffFiles}") <(echo "${trackingFiles}"))
 
 gco "${mergeHash}"
-afterStats=($(echo "${changedAndTrackedFiles}" | ${workingDir}/csreport.sh ${quietFlag} -s))
+afterStats=($(echo "${changedAndTrackedFiles}" | ${workingDir}/csReport ${quietFlag} -s))
 
 gco "${baseHash}"
-beforeStats=($(echo "${changedAndTrackedFiles}" | ${workingDir}/csreport.sh ${quietFlag} -s))
+beforeStats=($(echo "${changedAndTrackedFiles}" | ${workingDir}/csReport ${quietFlag} -s))
 
 gco "${startingCommit}"
 

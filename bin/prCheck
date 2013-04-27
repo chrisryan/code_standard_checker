@@ -48,7 +48,7 @@ if ! git fetch "${REMOTE}" "+refs/pull/${PULL}/head:refs/remotes/${localRef}"; t
     exit 1
 fi
 
-result=$(${workingDir}/mergeReport.sh ${quietFlag} ${shortFlag} -c "${localRef}" -b "${REMOTE}/master")
+result=$(${workingDir}/mergeReport ${quietFlag} ${shortFlag} -c "${localRef}" -b "${REMOTE}/master")
 echo "${result}"
 
 githubComment="This comment was generated automatically by the [coding standard checker](https://github.com/chrisryan/code_standard_checker).\\n\\n${result//
