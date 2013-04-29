@@ -21,12 +21,18 @@ if (!array_key_exists('number', $request)) {
 fwrite($stderr, "Processing request\n");
 $repository = $request['repository']['full_name'];
 $pullNumber = $request['number'];
+$mergeHash = $request['pull_request']['merge_commit_sha'];
 
 $mongoUrl = parse_url(getenv('MONGOHQ_URL'));
 $dbName = str_replace('/', '', $mongoUrl['path']);
 
 $m = new Mongo(getenv('MONGOHQ_URL'));
 $db = $m->$dbName;
-$pulls = $db->pulls;
+$processedCommits = $db->processedCommits;
 
-$pulls->insert(array('repository' => $repository, 'number' => $pullNumber));
+if ($processedCommits->findOne(array('mergeHash' => $mergeHash)) === null) {
+    $processedCommits->insert(array('mergeHash' => $mergeHash));
+
+    $pulls = $db->pulls;
+    $pulls->insert(array('repository' => $repository, 'number' => $pullNumber));
+}
