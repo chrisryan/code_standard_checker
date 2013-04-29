@@ -44,3 +44,4 @@ $processedCommits->insert(array('mergeHash' => $mergeHash));
 
 $pulls = $db->pulls;
 $pulls->insert(array('repository' => $repository, 'number' => $pullNumber));
+fwrite($stderr, "Queued {$repository}#{$pullNumber}\n");
