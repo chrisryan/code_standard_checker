@@ -18,15 +18,15 @@ if (!array_key_exists('number', $request)) {
     return;
 }
 
-if ($request['pull_request']['state'] !== 'open') {
-    fwrite($stderr, "Request was not open but was in state {$request['pull_request']['state']}\n");
-    return;
-}
-
 $repository = $request['repository']['full_name'];
 $pullNumber = $request['number'];
 $mergeHash = $request['pull_request']['merge_commit_sha'];
 fwrite($stderr, "Processing request {$repository}#{$pullNumber}\n");
+
+if ($request['pull_request']['state'] !== 'open') {
+    fwrite($stderr, "Request was not open but was in state {$request['pull_request']['state']}\n");
+    return;
+}
 
 $mongoUrl = parse_url(getenv('MONGOHQ_URL'));
 $dbName = str_replace('/', '', $mongoUrl['path']);
