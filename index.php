@@ -18,6 +18,11 @@ if (!array_key_exists('number', $request)) {
     return;
 }
 
+if ($request['pull_request']['state'] !== 'open') {
+    fwrite($stderr, "Request was not open but was in state {$request['pull_request']['state']}\n");
+    return;
+}
+
 fwrite($stderr, "Processing request\n");
 $repository = $request['repository']['full_name'];
 $pullNumber = $request['number'];
