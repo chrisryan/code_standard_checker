@@ -57,11 +57,10 @@ trackingFiles=$(cat <(echo "${trackingFilesAfter}") <(echo "${trackingFilesBefor
 gitDiffFiles=$(git diff-tree --name-only -r "${baseHash}" "${mergeHash}" | sort)
 changedAndTrackedFiles=$(comm -12 <(echo "${gitDiffFiles}") <(echo "${trackingFiles}"))
 
+beforeStats=($(echo "${changedAndTrackedFiles}" | ${workingDir}/csReport ${quietFlag} -s))
+
 gco "${mergeHash}"
 afterStats=($(echo "${changedAndTrackedFiles}" | ${workingDir}/csReport ${quietFlag} -s))
-
-gco "${baseHash}"
-beforeStats=($(echo "${changedAndTrackedFiles}" | ${workingDir}/csReport ${quietFlag} -s))
 
 gco "${startingCommit}"
 
