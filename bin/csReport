@@ -1,5 +1,7 @@
 #!/bin/bash
 
+workingDir=$(readlink -m $(dirname "${0}"))
+appDir=$(dirname "${workingDir}")
 QUIET=false
 SHORT=false
 FILELIST=-
@@ -40,10 +42,15 @@ while read file; do
     proccnt=$(expr "${proccnt}" + 1)
     "${QUIET}" || echo -en "processing ${proccnt} of ${filecount}: ${blue}${file}${clroff}..." >&2
 
+    if [ ! -f "${file}" ]; then
+        printf "\r%28s : ${blue}${file}${clroff}\n" "file does not exist" >&2
+        continue
+    fi
+
     lncnt=$(wc -l < "${file}")
     linecount=$(expr "${linecount}" + "${lncnt}")
 
-    if phpcs=$(phpcs --standard=DWS --report=summary "${file}"); then
+    if phpcs=$(${appDir}/vendor/bin/phpcs --standard="${appDir}/dws-coding-standard/DWS" --report=summary "${file}"); then
         errcnt=0
         wrncnt=0
     else
@@ -94,7 +101,7 @@ while read file; do
         [ "${wrnpcnt}" -gt 20 ] && wrnpclr="${purple}"
         [ "${wrnpcnt}" -gt 30 ] && wrnpclr="${brightpurple}"
 
-        printf "\r${errclr}%10s${clroff} ${errpclr}%5s${clroff} ${wrnclr}%5s${clroff} ${wrnpclr}%5s${clroff} : ${blue}${file}${clroff}\n" "${errcnt}E" "${errpcnt}%E" "${wrncnt}W" "${wrnpcnt}%W"
+        printf "\r${errclr}%10s${clroff} ${errpclr}%5s${clroff} ${wrnclr}%5s${clroff} ${wrnpclr}%5s${clroff} : ${blue}${file}${clroff}\n" "${errcnt}E" "${errpcnt}%E" "${wrncnt}W" "${wrnpcnt}%W" >&2
     fi
 done <<< "${files}"
 

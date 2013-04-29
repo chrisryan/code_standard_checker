@@ -1,0 +1,27 @@
+{
+    "name": "chrisryan/code_standard_checker",
+    "description": "DWS Coding Standard Validator",
+    "keywords": ["phpcs", "coding", "standard"],
+    "authors": [
+        {
+            "name": "Chris Ryan",
+            "email": "christopher.ryan@dominionenterprises.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Anthony Bittle",
+            "email": "robert.bittle@dominionenterprises.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Spencer Rinehart",
+            "email": "spencer.rinehart@dominionenterprises.com",
+            "role": "Developer"
+        }
+    ],
+    "license": "proprietary",
+    "require": {
+        "php": ">=5.3.2",
+        "squizlabs/php_codesniffer": "~1.4"
+    }
+}

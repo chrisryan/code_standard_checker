@@ -1,5 +1,5 @@
 #!/bin/bash
-workingDir=$(realpath $(dirname "${0}"))
+workingDir=$(readlink -m $(dirname "${0}"))
 update=false
 
 if [ "${1}" = '-u' ]; then
@@ -26,4 +26,4 @@ if "${update}"; then
     cd - >/dev/null
 fi
 
-${workingDir}/getFiles.sh "${codeDir}" | ${workingDir}/csreport.sh -f -
+${workingDir}/getFiles "${codeDir}" | ${workingDir}/csReport -f -
