@@ -23,10 +23,10 @@ if ($request['pull_request']['state'] !== 'open') {
     return;
 }
 
-fwrite($stderr, "Processing request\n");
 $repository = $request['repository']['full_name'];
 $pullNumber = $request['number'];
 $mergeHash = $request['pull_request']['merge_commit_sha'];
+fwrite($stderr, "Processing request {$repository}#{$pullNumber}\n");
 
 $mongoUrl = parse_url(getenv('MONGOHQ_URL'));
 $dbName = str_replace('/', '', $mongoUrl['path']);
@@ -35,9 +35,12 @@ $m = new Mongo(getenv('MONGOHQ_URL'));
 $db = $m->$dbName;
 $processedCommits = $db->processedCommits;
 
-if ($processedCommits->findOne(array('mergeHash' => $mergeHash)) === null) {
-    $processedCommits->insert(array('mergeHash' => $mergeHash));
-
-    $pulls = $db->pulls;
-    $pulls->insert(array('repository' => $repository, 'number' => $pullNumber));
+if ($processedCommits->findOne(array('mergeHash' => $mergeHash)) !== null) {
+    fwrite($stderr, "Already handled {$mergeHash}\n");
+    return;
 }
+
+$processedCommits->insert(array('mergeHash' => $mergeHash));
+
+$pulls = $db->pulls;
+$pulls->insert(array('repository' => $repository, 'number' => $pullNumber));
