@@ -4,7 +4,7 @@ $mongo = new MongoClient();
 $db = $mongo->selectDB('tolMergeStats');
 $collection = new MongoCollection($db, 'merges');
 
-$mergeReportCommand = dirname(__FILE__) . '/mergeReport.sh';
+$mergeReportCommand = dirname(dirname(__FILE__)) . '/bin/mergeReport';
 
 exec('git log --merges --format="%h|||%p|||%s" --since=04/10/13', $logData);
 

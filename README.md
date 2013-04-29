@@ -11,5 +11,5 @@ If you would like to run this automatically, consider keeping a separate checkou
 the `-u` flag to automatically update the code to the latest on the current remote tracking branch:
 
 ```sh
-./fullreport.sh -u /path/to/codebase
+./bin/fullReport -u /path/to/codebase
 ```
