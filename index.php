@@ -35,7 +35,7 @@ $m = new Mongo(getenv('MONGOHQ_URL'));
 $db = $m->$dbName;
 $processedCommits = $db->processedCommits;
 
-if ($processedCommits->findOne(array('mergeHash' => $mergeHash)) !== null) {
+if ($mergeHash !== null && $processedCommits->findOne(array('mergeHash' => $mergeHash)) !== null) {
     fwrite($stderr, "Already handled {$mergeHash}\n");
     return;
 }
