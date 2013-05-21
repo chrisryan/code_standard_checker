@@ -43,6 +43,7 @@ while read file; do
     "${QUIET}" || echo -en "processing ${proccnt} of ${filecount}: ${blue}${file}${clroff}..." >&2
 
     if [ ! -f "${file}" ]; then
+        filecount=$(expr "${filecount}" - 1)
         printf "\r%28s : ${blue}${file}${clroff}\n" "file does not exist" >&2
         continue
     fi
@@ -57,7 +58,6 @@ while read file; do
         counts=$(echo "${phpcs}" | sed '/A TOTAL OF/!d; s/A TOTAL OF \([0-9]\+\) ERROR(S) AND \([0-9]\+\) WARNING(S) .*/\1 \2/')
         read errcnt wrncnt <<< "${counts}"
 
-        filcnt=$(expr "${filcnt}" + 1)
         errtot=$(expr "${errcnt}" + "${errtot}")
         wrntot=$(expr "${wrncnt}" + "${wrntot}")
     fi
@@ -66,6 +66,7 @@ while read file; do
         errpcnt=0
         wrnpcnt=0
     else
+        filcnt=$(expr "${filcnt}" + 1)
         errpcnt=$(expr "${errcnt}" \* 100 / "${lncnt}")
         wrnpcnt=$(expr "${wrncnt}" \* 100 / "${lncnt}")
     fi
