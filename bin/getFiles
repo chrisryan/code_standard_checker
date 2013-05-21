@@ -15,6 +15,7 @@ find $codeDir -type f \
     \! -name '*.js' \
     \! -name '*.css' \
     \! -name '*.json' \
+    \! -name '*.phtml' \
     \! -name '*.sh' \
     \! -name '*.txt' \
     \! -name '*.gitignore' \
