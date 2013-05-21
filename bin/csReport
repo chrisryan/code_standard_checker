@@ -49,7 +49,7 @@ while read file; do
     fi
 
     lncnt=$(wc -l < "${file}")
-    linecount=$(expr "${linecount}" + "${lncnt}")
+    [ -n "${lncnt}" ] && linecount=$(expr "${linecount}" + "${lncnt}")
 
     if phpcs=$(${appDir}/vendor/bin/phpcs --standard="${appDir}/dws-coding-standard/DWS" --report=summary "${file}"); then
         errcnt=0
@@ -58,8 +58,8 @@ while read file; do
         counts=$(echo "${phpcs}" | sed '/A TOTAL OF/!d; s/A TOTAL OF \([0-9]\+\) ERROR(S) AND \([0-9]\+\) WARNING(S) .*/\1 \2/')
         read errcnt wrncnt <<< "${counts}"
 
-        errtot=$(expr "${errcnt}" + "${errtot}")
-        wrntot=$(expr "${wrncnt}" + "${wrntot}")
+        [ -n "${errcnt}" ] && errtot=$(expr "${errcnt}" + "${errtot}")
+        [ -n "${wrncnt}" ] && wrntot=$(expr "${wrncnt}" + "${wrntot}")
     fi
 
     if [ "${lncnt}" = "0" ]; then
@@ -67,8 +67,8 @@ while read file; do
         wrnpcnt=0
     else
         filcnt=$(expr "${filcnt}" + 1)
-        errpcnt=$(expr "${errcnt}" \* 100 / "${lncnt}")
-        wrnpcnt=$(expr "${wrncnt}" \* 100 / "${lncnt}")
+        [ -n "${errcnt}" ] && errpcnt=$(expr "${errcnt}" \* 100 / "${lncnt}")
+        [ -n "${wrncnt}" ] && wrnpcnt=$(expr "${wrncnt}" \* 100 / "${lncnt}")
     fi
 
     if ! "${QUIET}"; then
