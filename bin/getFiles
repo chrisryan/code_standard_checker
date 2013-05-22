@@ -15,6 +15,7 @@ find $codeDir -type f \
     \! -name '*.js' \
     \! -name '*.css' \
     \! -name '*.json' \
+    \! -name '*.html' \
     \! -name '*.phtml' \
     \! -name '*.templ' \
     \! -name '*.sh' \
@@ -32,6 +33,8 @@ find $codeDir -type f \
     \! -name '*woff' \
     \! -name '*svg' \
     \! -name '*eot' \
+    \! -name '*.ttf' \
+    \! -name '*.otf' \
     \! -name '*.pdf' \
     \! -name '*.conf' \
     \! -name '*.basemod' \
