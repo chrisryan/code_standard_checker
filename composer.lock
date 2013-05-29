@@ -1,6 +1,58 @@
 {
-    "hash": "62ebaccb122f413d3126f7919f926f22",
+    "hash": "d1a9f5b50f12cec16496b70690b96f0a",
     "packages": [
+        {
+            "name": "dominionenterprises/dws-coding-standard",
+            "version": "v1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dominionenterprises/dws-coding-standard.git",
+                "reference": "v1.1.1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dominionenterprises/dws-coding-standard/zipball/v1.1.1",
+                "reference": "v1.1.1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2",
+                "squizlabs/php_codesniffer": ">=1.4,<2.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": ">=3.7.19.0,<3.8",
+                "lib-libxml": "*"
+            },
+            "time": "2013-05-28 16:32:59",
+            "type": "library",
+            "installation-source": "dist",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chad Gray",
+                    "email": "chad.gray@dominionenterprises.com",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Spencer Rinehart",
+                    "email": "spencer.rinehart@dominionenterprises.com",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Jonathan Gaillard",
+                    "email": "jonathan.gaillard@dominionenterprises.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "DWS Coding standard",
+            "keywords": [
+                "standard",
+                "phpcs",
+                "coding"
+            ]
+        },
         {
             "name": "squizlabs/php_codesniffer",
             "version": "1.4.5",

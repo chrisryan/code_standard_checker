@@ -16,5 +16,9 @@ foreach ($pulls->find() as $pull) {
 
     $command = "{$prCheckPath} -r origin -p {$pull['number']} -g {$githubToken} -R {$pull['repository']} {$appPath}/data/${pull['repository']}";
     echo "Executing {$command}\n";
-    passthru($command);
+    $exitStatus = null;
+    passthru($command, $exitStatus);
+    if ($exitStatus !== 0) {
+        $pulls->insert($pull);
+    }
 }
