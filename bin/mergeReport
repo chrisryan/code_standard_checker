@@ -54,8 +54,11 @@ gco "${baseHash}"
 trackingFilesBefore=$(${workingDir}/getFiles | sed 's#^./##' | sort)
 
 trackingFiles=$(cat <(echo "${trackingFilesAfter}") <(echo "${trackingFilesBefore}") | sort | uniq)
+[ -z "${trackingFiles}" ] && exit 1
+
 gitDiffFiles=$(git diff-tree --name-only -r "${baseHash}" "${mergeHash}" | sort)
 changedAndTrackedFiles=$(comm -12 <(echo "${gitDiffFiles}") <(echo "${trackingFiles}"))
+[ -z "${changedAndTrackedFiles}" ] && exit 1
 
 beforeStats=($(echo "${changedAndTrackedFiles}" | ${workingDir}/csReport ${quietFlag} -s))
 
