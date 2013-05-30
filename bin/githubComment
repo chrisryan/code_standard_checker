@@ -1,0 +1,46 @@
+#!/bin/bash
+githubPull=''
+githubToken=''
+githubRepository=''
+message=''
+while getopts "p:g:R:m:" opt; do
+    case "${opt}" in
+    p)
+        githubPull="${OPTARG}"
+        ;;
+    R)
+        githubRepository="${OPTARG}"
+	;;
+    g)
+        githubToken="${OPTARG}"
+	;;
+    m)
+        message="${OPTARG}"
+    ;;
+    esac
+done
+
+if [ -z "${githubPull}" ]; then
+    echo "Must specify a pull request number" >&2
+    exit 1
+fi
+
+if [ -z "${githubRepository}" ]; then
+    echo "Must specify a github repository" >&2
+    exit 1
+fi
+
+if [ -z "${githubToken}" ]; then
+    echo "Must specify a github api token" >&2
+    exit 1
+fi
+
+if [ -z "${message}" ]; then
+    echo "Must specify a message" >&2
+    exit 1
+fi
+
+githubComment="This comment was generated automatically by the [coding standard checker](https://github.com/chrisryan/code_standard_checker).\\n\\n${message//
+/\\n}"
+
+curl -H "Authorization: token ${githubToken}" -d "{\"body\": \"${githubComment}\"}" "https://api.github.com/repos/${githubRepository}/issues/${githubPull}/comments" >&2
