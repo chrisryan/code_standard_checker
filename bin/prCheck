@@ -31,7 +31,7 @@ done
 
 if [ "$PULL" = '' ]
 then
-    echo Must specify a pull request number
+    echo Must specify a pull request number >&2
     exit
 fi
 
@@ -41,28 +41,17 @@ shift $(expr "${OPTIND}" - 1)
 codeDir="${1:-.}"
 if [ ! -d "${codeDir}" ]; then
     if [ -n "${githubToken}" -a -n "${githubRepository}" ]; then
-        git clone "https://${githubToken}:x-oauth-basic@github.com/${githubRepository}.git" "${codeDir}"
+        git clone "https://${githubToken}:x-oauth-basic@github.com/${githubRepository}.git" "${codeDir}" >&2
     fi
 fi
 
 cd "${codeDir}" || exit 1
 
 localRef="${REMOTE}/pr/${PULL}"
-if ! git fetch "${REMOTE}" "+refs/pull/${PULL}/head:refs/remotes/${localRef}"; then
+if ! git fetch "${REMOTE}" "+refs/pull/${PULL}/head:refs/remotes/${localRef}" >&2; then
     echo 'Unknown error' >&2
     exit 1
 fi
 
-result=$(${workingDir}/mergeReport ${quietFlag} ${shortFlag} -c "${localRef}" -b "${REMOTE}/master")
-mergeStatus="${?}"
-echo "${result}"
-
-githubComment="This comment was generated automatically by the [coding standard checker](https://github.com/chrisryan/code_standard_checker).\\n\\n${result//
-/\\n}"
-
-if [ -n "${githubToken}" -a "${mergeStatus}" -eq 0 ]; then
-    githubRepo=$(git config --get "remote.${REMOTE}.url" | sed 's#.*[:/]\([^/]\+/[^/.]\+\)\.git.*#\1#')
-    curl -H "Authorization: token ${githubToken}" -d "{\"body\": \"${githubComment}\"}" "https://api.github.com/repos/${githubRepo}/issues/${PULL}/comments" >&2
-fi
-
-exit "${mergeStatus}"
+${workingDir}/mergeReport ${quietFlag} ${shortFlag} -c "${localRef}" -b "${REMOTE}/master"
+exit "${?}"
