@@ -1,6 +1,7 @@
 <?php
 $appPath = __DIR__;
 $prCheckPath = "${appPath}/bin/prCheck";
+$githubCommentPath = "${appPath}/bin/githubComment";
 $githubToken = getenv('GITHUB_API_TOKEN');
 
 $mongoUrl = parse_url(getenv('MONGOHQ_URL'));
@@ -17,8 +18,14 @@ foreach ($pulls->find() as $pull) {
     $command = "{$prCheckPath} -r origin -p {$pull['number']} -g {$githubToken} -R {$pull['repository']} {$appPath}/data/${pull['repository']}";
     echo "Executing {$command}\n";
     $exitStatus = null;
-    passthru($command, $exitStatus);
-    if ($exitStatus !== 0) {
+    $output = null;
+    exec($command, $output, $exitStatus);
+    $output = implode("\n", $output) . "\n";
+    echo $output;
+
+    if ($exitStatus === 0) {
+        passthru("{$githubCommentPath} -R {$pull['repository']} -p {$pull['number']} -g {$githubToken} -m " . escapeshellarg($output));
+    } else {
         $pulls->insert($pull);
     }
 }
