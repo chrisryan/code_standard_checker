@@ -31,7 +31,7 @@ done
 
 if [ "$PULL" = '' ]
 then
-    echo Must specify a pull request number
+    echo Must specify a pull request number >&2
     exit
 fi
 
@@ -41,14 +41,14 @@ shift $(expr "${OPTIND}" - 1)
 codeDir="${1:-.}"
 if [ ! -d "${codeDir}" ]; then
     if [ -n "${githubToken}" -a -n "${githubRepository}" ]; then
-        git clone "https://${githubToken}:x-oauth-basic@github.com/${githubRepository}.git" "${codeDir}"
+        git clone "https://${githubToken}:x-oauth-basic@github.com/${githubRepository}.git" "${codeDir}" >&2
     fi
 fi
 
 cd "${codeDir}" || exit 1
 
 localRef="${REMOTE}/pr/${PULL}"
-if ! git fetch "${REMOTE}" "+refs/pull/${PULL}/head:refs/remotes/${localRef}"; then
+if ! git fetch "${REMOTE}" "+refs/pull/${PULL}/head:refs/remotes/${localRef}" >&2; then
     echo 'Unknown error' >&2
     exit 1
 fi
