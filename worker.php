@@ -16,7 +16,16 @@ foreach ($pulls->find() as $pull) {
     echo "Handling PR #{$pull['number']} for {$pull['repository']}\n";
     $pulls->remove($pull);
 
-    $repositoryPath = "{$appPath}/data/${pull['repository']}";
+    $curl = curl_init("https://api.github.com/repos/{$pull['repository']}/pulls/{$pull['number']}?access_token={$githubToken}");
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array('User-Agent: CodeStandardChecker/1.0'));
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    $result = json_decode(curl_exec($curl), true);
+    if (is_array($result) && array_key_exists('state', $result) && $result['state'] !== 'open') {
+        echo "Pull Request is closed.\n";
+        continue;
+    }
+
+    $repositoryPath = "{$appPath}/data/{$pull['repository']}";
     $command = "{$prCheckPath} -r origin -p {$pull['number']} -g {$githubToken} -R {$pull['repository']} -s {$repositoryPath}";
     echo "Executing {$command}\n";
     $exitStatus = null;
