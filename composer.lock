@@ -7,16 +7,16 @@
     "packages": [
         {
             "name": "dominionenterprises/dws-coding-standard",
-            "version": "v1.1.2",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dominionenterprises/dws-coding-standard.git",
-                "reference": "v1.1.2"
+                "reference": "v1.2.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dominionenterprises/dws-coding-standard/zipball/v1.1.2",
-                "reference": "v1.1.2",
+                "url": "https://api.github.com/repos/dominionenterprises/dws-coding-standard/zipball/v1.2.0",
+                "reference": "v1.2.0",
                 "shasum": ""
             },
             "require": {
@@ -55,7 +55,7 @@
                 "phpcs",
                 "standard"
             ],
-            "time": "2013-05-29 16:49:53"
+            "time": "2013-06-07 13:14:46"
         },
         {
             "name": "squizlabs/php_codesniffer",
