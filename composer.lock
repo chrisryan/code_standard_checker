@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "d1a9f5b50f12cec16496b70690b96f0a",
+    "hash": "8f3dd626d5199f02b66449faabb461ac",
     "packages": [
         {
             "name": "dominionenterprises/dws-coding-standard",
@@ -59,20 +59,24 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "1.4.5",
+            "version": "1.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "1.4.5"
+                "reference": "a99caa52ed173ee83d6721ba012614f38c1dcbb6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/1.4.5",
-                "reference": "1.4.5",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/a99caa52ed173ee83d6721ba012614f38c1dcbb6",
+                "reference": "a99caa52ed173ee83d6721ba012614f38c1dcbb6",
                 "shasum": ""
             },
             "require": {
+                "ext-tokenizer": "*",
                 "php": ">=5.1.2"
+            },
+            "suggest": {
+                "phpunit/php-timer": "dev-master"
             },
             "bin": [
                 "scripts/phpcs"
@@ -106,6 +110,7 @@
                     "CodeSniffer/Standards/Zend/Sniffs/"
                 ]
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -121,7 +126,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2013-04-03 23:16:28"
+            "time": "2013-07-25 03:49:02"
         }
     ],
     "packages-dev": [
