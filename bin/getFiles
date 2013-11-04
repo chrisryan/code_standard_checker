@@ -55,6 +55,7 @@ find $codeDir -type f \
     \! -path '*/library/CAS/*' \
     \! -path '*/PEAR/*' \
     \! -path '*/Apache/*' \
+    \! -path '*/Gigya/*' \
     \! -path '*/CodeCoverage/Report/*' \
     \! -path '*/about/newsletter/*' \
     \! -path '*/newsletter/*.html' \
