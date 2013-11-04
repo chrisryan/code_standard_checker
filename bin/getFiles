@@ -42,6 +42,8 @@ find $codeDir -type f \
     \! -name '*.md' \
     \! -name '*.markdown' \
     \! -name '*.git' \
+    \! -name '*.config' \
+    \! -name '*.htaccess' \
     \! -path '*/.git/*' \
     \! -path '*/vendor/*' \
     \! -path '*/www/files/research/*' \
