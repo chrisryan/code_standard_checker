@@ -23,6 +23,6 @@
     "require": {
         "php": "~5.4",
         "squizlabs/php_codesniffer": "~1.4",
-        "dominionenterprises/dws-coding-standard": "~1.3"
+        "dominionenterprises/dws-coding-standard": "~1.4"
     }
 }
