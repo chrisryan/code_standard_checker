@@ -37,7 +37,7 @@ if ! git diff-index --quiet HEAD; then
     exit 1
 fi
 
-mergeHash=$(git rev-parse --abbrev-ref "${mergeRef}")
+mergeHash=$(git rev-parse "${mergeRef}")
 baseHash=$(git rev-parse "${mergeRef}~")
 [ -n "${baseRef}" ] && baseHash=$(git rev-parse "${baseRef}")
 baseHash=$(git merge-base "${baseHash}" "${mergeHash}")
