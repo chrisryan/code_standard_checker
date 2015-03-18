@@ -1,8 +1,11 @@
 <?php
+// Heroku Scheduler Command
+// php -c $HOME/conf/etc.d/04_mongo.ini $HOME/worker.php
 $appPath = __DIR__;
 $prCheckPath = "${appPath}/bin/prCheck";
 $githubCommentPath = "${appPath}/bin/githubComment";
 $githubToken = getenv('GITHUB_API_TOKEN');
+$guthubApiUrl = getenv('GITHUB_API_URL') ?: 'https://api.github.com';
 
 $mongoUrl = parse_url(getenv('MONGOHQ_URL'));
 $dbName = str_replace('/', '', $mongoUrl['path']);
@@ -16,7 +19,7 @@ foreach ($pulls->find() as $pull) {
     echo "Handling PR #{$pull['number']} for {$pull['repository']}\n";
     $pulls->remove($pull);
 
-    $curl = curl_init("https://api.github.com/repos/{$pull['repository']}/pulls/{$pull['number']}?access_token={$githubToken}");
+    $curl = curl_init("{$guthubApiUrl}/repos/{$pull['repository']}/pulls/{$pull['number']}?access_token={$githubToken}");
     curl_setopt($curl, CURLOPT_HTTPHEADER, array('User-Agent: CodeStandardChecker/1.0'));
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     $result = json_decode(curl_exec($curl), true);
