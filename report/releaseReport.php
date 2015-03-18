@@ -16,7 +16,7 @@ foreach ($logData as $logLine) {
     $commitMessage = $arLog[2];
     if ($collection->findOne(array('Hash' => $commitHash)) == null) {
         exec($mergeReportCommand . ' -sqc ' . $commitHash, $reportData);
-        $reportData = explode(' ', $reportData[0]);
+        $reportData = isset($reportData[0]) ? explode(' ', $reportData[0]) : [];
         if (count($reportData) == 5) {
             $collection->insert(
                 array(
