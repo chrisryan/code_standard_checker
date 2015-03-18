@@ -6,7 +6,7 @@ $collection = new MongoCollection($db, 'merges');
 
 $mergeReportCommand = dirname(dirname(__FILE__)) . '/bin/mergeReport';
 
-exec('git log --merges --format="%h|||%p|||%s" --since=04/10/13', $logData);
+exec('git log --merges --format="%h|||%p|||%s" --since=03/17/14', $logData);
 
 foreach ($logData as $logLine) {
     $reportData = array();
